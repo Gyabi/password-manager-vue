@@ -5,7 +5,7 @@
       color="primary"
       dark
     >
-      <div class="d-flex align-center">
+      <!-- <div class="d-flex align-center">
         <v-img
           alt="Vuetify Logo"
           class="shrink mr-2"
@@ -34,22 +34,25 @@
       >
         <span class="mr-2">Latest Release</span>
         <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
+      </v-btn> -->
     </v-app-bar>
 
     <v-main>
       <v-img alt="test image" contain src="@/assets/logo.png" class="shrink mr-2" transition="scale-transition" width="40"/>
-
-      <HelloWorld/>
-      <Top :jsondata="jsondata"/>
-      <!-- <button v-on:click="getJson">aaa</button> -->
+      <div v-if="editMode === false">
+        <Main :jsondata="jsondata" v-on:changeEdit="changeEdit"></Main>
+      </div>
+      <div v-else>
+        <Edit :jsondata="jsondata" v-on:changeEdit="changeEdit"></Edit>
+      </div>
     </v-main>
+
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
-import Top from './components/Top';
+import Main from './components/Main';
+import Edit from './components/Edit';
 const fs = require('fs');
 
 
@@ -57,19 +60,24 @@ export default {
   name: 'App',
 
   components: {
-    HelloWorld,
-    Top,
+    Main:Main,
+    Edit:Edit
   },
 
   data: () => ({
     //
-    jsondata:[]
+    jsondata:[],
+    editMode: false,
   }),
 
   methods:{
     reloadJson(){
       this.jsondata = JSON.parse(fs.readFileSync('C:/Users/buyuu/Programming/005_Electron/password-manager-vue/src/password/password.json', 'utf8'));
-    }
+    },
+    changeEdit(){
+      console.log("changeEdit");
+      this.editMode = !this.editMode;
+    },
   },
   mounted(){
     // this.jsondata = JSON.parse(fs.readFileSync('@/src/password/password.json', 'utf8'));
