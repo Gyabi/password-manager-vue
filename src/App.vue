@@ -1,49 +1,27 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <!-- <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn> -->
-    </v-app-bar>
+    <div v-if="editMode===true">
+      <v-app-bar app color="secondary" dark>
+        <v-toolbar-title>Password Manager</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-title>Edit Mode</v-toolbar-title>
+      </v-app-bar>
+    </div>
+    <div v-else>
+      <v-app-bar app color="primary" dark>
+        <v-toolbar-title>Password Manager</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-title>Main Mode</v-toolbar-title>
+      </v-app-bar>
+    </div>
 
     <v-main>
-      <v-img alt="test image" contain src="@/assets/logo.png" class="shrink mr-2" transition="scale-transition" width="40"/>
+      <!-- <v-img alt="test image" contain src="@/assets/logo.png" class="shrink mr-2" transition="scale-transition" width="40"/> -->
       <div v-if="editMode === false">
-        <Main :jsondata="jsondata" v-on:changeEdit="changeEdit"></Main>
+        <Main :jsondata="jsondata" @changeEdit="changeEdit"></Main>
       </div>
       <div v-else>
-        <Edit :jsondata="jsondata" v-on:changeEdit="changeEdit"></Edit>
+        <Edit :jsondata="jsondata" @changeEdit="changeEdit" @update-Json="updateJson"></Edit>
       </div>
     </v-main>
 
@@ -71,16 +49,34 @@ export default {
   }),
 
   methods:{
+    // jsonファイルの読み込み
     reloadJson(){
       this.jsondata = JSON.parse(fs.readFileSync('C:/Users/buyuu/Programming/005_Electron/password-manager-vue/src/password/password.json', 'utf8'));
     },
+    // editモードとの切り替え
     changeEdit(){
       console.log("changeEdit");
       this.editMode = !this.editMode;
     },
-  },
+    // jsonファイルの保存
+    saveJson(){
+      console.log("saveJson");
+      fs.writeFileSync('C:/Users/buyuu/Programming/005_Electron/password-manager-vue/src/password/password.json', JSON.stringify(this.jsondata, null, 2));
+    },
+    // jsonファイルの更新（Edit.vueからコールされる）
+    updateJson(jsondata){
+      console.log("updateJson");
+      this.jsondata = jsondata;
+      // jsonの保存
+      this.saveJson();
+      // 一応リロード
+      this.reloadJson();
+      // this.editMode = false;
+    }
+},
   mounted(){
     // this.jsondata = JSON.parse(fs.readFileSync('@/src/password/password.json', 'utf8'));
+    // 準備ができたらjsonファイルを読み込む
     this.jsondata = JSON.parse(fs.readFileSync('C:/Users/buyuu/Programming/005_Electron/password-manager-vue/src/password/password.json', 'utf8'));
   }
   
@@ -88,3 +84,9 @@ export default {
 
 
 </script>
+
+<style>
+/* .v-application{
+    font-family: "M Plus 1p" !important;
+} */
+</style>
