@@ -32,7 +32,20 @@
 import Main from './components/Main';
 import Edit from './components/Edit';
 const fs = require('fs');
+const remote = require('electron').remote;
+const path = require('path');
 
+
+const rootpath = remote.app.getAppPath();
+console.log(rootpath);
+var jsonpath;
+if(process.env.NODE_ENV === 'development'){
+  // 開発時
+  jsonpath = rootpath + "/../src/password/password.json";
+}else{
+  // 本番環境（app.asarのpathが来るので）
+  jsonpath = path.dirname(rootpath) + "/src/password/password.json";
+}
 
 export default {
   name: 'App',
@@ -51,7 +64,8 @@ export default {
   methods:{
     // jsonファイルの読み込み
     reloadJson(){
-      this.jsondata = JSON.parse(fs.readFileSync('C:/Users/buyuu/Programming/005_Electron/password-manager-vue/src/password/password.json', 'utf8'));
+      this.jsondata = JSON.parse(fs.readFileSync(jsonpath, 'utf8'));
+      // this.jsondata = JSON.parse(fs.readFileSync('C:/Users/buyuu/Programming/005_Electron/password-manager-vue/src/password/password.json', 'utf8'));
     },
     // editモードとの切り替え
     changeEdit(){
@@ -61,7 +75,8 @@ export default {
     // jsonファイルの保存
     saveJson(){
       console.log("saveJson");
-      fs.writeFileSync('C:/Users/buyuu/Programming/005_Electron/password-manager-vue/src/password/password.json', JSON.stringify(this.jsondata, null, 2));
+      // fs.writeFileSync('C:/Users/buyuu/Programming/005_Electron/password-manager-vue/src/password/password.json', JSON.stringify(this.jsondata, null, 2));
+      fs.writeFileSync(jsonpath, JSON.stringify(this.jsondata, null, 2));
     },
     // jsonファイルの更新（Edit.vueからコールされる）
     updateJson(jsondata){
@@ -77,7 +92,8 @@ export default {
   mounted(){
     // this.jsondata = JSON.parse(fs.readFileSync('@/src/password/password.json', 'utf8'));
     // 準備ができたらjsonファイルを読み込む
-    this.jsondata = JSON.parse(fs.readFileSync('C:/Users/buyuu/Programming/005_Electron/password-manager-vue/src/password/password.json', 'utf8'));
+    this.jsondata = JSON.parse(fs.readFileSync(jsonpath, 'utf8'));
+    // this.jsondata = JSON.parse(fs.readFileSync('C:/Users/buyuu/Programming/005_Electron/password-manager-vue/src/password/password.json', 'utf8'));
   }
   
 };
